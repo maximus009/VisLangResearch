@@ -1,0 +1,8 @@
+*.npy
+*.pyc
+*.jpg
+frames/*
+history_log/*
+*.zip
+experiment_stats/*
+models/*
