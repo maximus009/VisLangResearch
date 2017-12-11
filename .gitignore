@@ -6,3 +6,6 @@ history_log/*
 *.zip
 experiment_stats/*
 models/*
+*.h5
+data/
+.ipynb_checkpoints/
