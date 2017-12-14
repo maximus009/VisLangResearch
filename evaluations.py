@@ -110,6 +110,10 @@ def infer_flownet(_id, model=None):
     else:
         return pred[0]
 
+def infer_fastText(_id, model=None):
+    pass
+
+
 
 def predict_genres_movie(config):
     ID = config['id']
