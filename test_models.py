@@ -29,3 +29,10 @@ def test_flownet_single(_id=999):
 
 def test_flownet_set(ids, labels, limit=None):
     ## this goes here
+    modelSavePath = os.path.join(base_path, 'trained_models', 'video', 'model_flow.h5')
+    s = time()
+    preds = infer_flownet(ids[:limit], model=modelSavePath)
+    print time()-s,'seconds'
+    p, r, a = find_precision_recall(labels[:limit], preds)
+    print a
+
