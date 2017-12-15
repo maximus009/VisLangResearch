@@ -1,7 +1,7 @@
 import os
 from time import time
 
-from evaluations import infer_flownet, infer_fastVideo, find_precision_recall
+from evaluations import infer_flownet, infer_fastVideo, find_precision_recall, infer_fastText
 from utils import get_ids, get_labels
 
 trainIds, valIds, testIds = get_ids()
@@ -36,3 +36,16 @@ def test_flownet_set(ids, labels, limit=None):
     p, r, a = find_precision_recall(labels[:limit], preds)
     print a
 
+def test_fastText_single(_id=999):
+    weightsPath = os.path.join(base_path, 'trained_weights', 'text', 'best_weights_glove.h5')
+    return infer_fastText(_id, weightsPath)
+
+def test_fastText_set(ids, labels, limit=None):
+    weightsPath = os.path.join(base_path, 'trained_weights', 'text', 'best_weights_glove.h5')
+    s = time()
+    preds = infer_fastText(ids[:limit], weightsPath)
+    print time()-s,"seconds"
+    p, r, a = find_precision_recall(labels[:limit], preds)
+    return a
+
+print test_fastText_set(testIds, testLabels)

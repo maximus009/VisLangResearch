@@ -3,10 +3,12 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 import os
 import numpy as np
+import gc
 
 from optical.optical_models import spatio_temporal_model
 from optical.optical_utils import get_blocks
 
+from text_summary.text_models import fastText_model
 
 base_path = os.getcwd()
 if not os.path.basename(base_path) == 'moviescope':
@@ -14,6 +16,8 @@ if not os.path.basename(base_path) == 'moviescope':
 
 from utils import load_pkl
 from keras.models import load_model
+
+import keras.backend as K
 
 ## common variables
 num_classes = 13
@@ -110,10 +114,55 @@ def infer_flownet(_id, model=None):
     else:
         return pred[0]
 
-def infer_fastText(_id, model=None):
-    pass
+def infer_fastText(_id, weightsPath=None):
+    if type(_id) == list:
+        _multiple = True
+    else:
+        _multiple = False
 
 
+    featuresPath = os.path.join(base_path, 'data', 'text_sequences')
+    input_sequences = []
+    if not _multiple:
+        ID = str(_id)
+        pklPath = os.path.join(featuresPath, ID+'.p')
+        sequence = load_pkl(pklPath)
+        input_sequences.append(sequence)
+    else:
+        for ID in _id:
+            ID = str(ID)
+            pklPath = os.path.join(featuresPath, ID+'.p')
+            sequence = load_pkl(pklPath)
+            input_sequences.append(sequence)
+    input_sequences = np.array(input_sequences)
+    del featuresPath
+
+    ## need to pick a separate model for each input length
+    if weightsPath is None:
+        print "No model passed."
+        return
+    ## always pass weights path. Model will be created dynamically
+
+    if not _multiple:
+        model = fastText_model(l=len(input_sequences[0]))
+        model.load_weights(weightsPath)
+        pred = model.predict(input_sequences)
+        return pred[0]
+    else:
+        pred = []
+        clear_ctr = 0
+        for seq in input_sequences:
+            clear_ctr += 1
+            model = fastText_model(l=len(seq))
+            model.load_weights(weightsPath)
+            seq = np.expand_dims(seq, 0)
+            _pred = model.predict(seq)
+            pred.append(_pred[0])
+            if clear_ctr % 150:
+                K.clear_session()
+        gc.collect()
+        pred = np.array(pred)
+        return pred
 
 def predict_genres_movie(config):
     ID = config['id']
