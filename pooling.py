@@ -70,6 +70,7 @@ from keras.optimizers import SGD, Adam
 
 avg_input = Input(shape=(x_train.shape[1],))
 hidden = Dense(512, activation='relu')(avg_input)
+hidden = Dense(64, activation='relu')(hidden)
 prediction = Dense(num_genres, activation='sigmoid')(hidden)
 
 model = Model(inputs=avg_input, outputs=prediction)
@@ -109,7 +110,8 @@ for epoch in range(1, epochs+1):
     val_ap = avg_pr['micro']
 
     if val_ap > best_ap:
-        model.save(modelSavePath)
+        #model.save(modelSavePath)
+        model.save_weights('weights_vis.h5')
         best_ap = val_ap
 
     print 'Epoch:{} Train AP:{} Val AP: {}'.format(epoch, train_ap, val_ap)
