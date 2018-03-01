@@ -3,6 +3,9 @@
 
 ## Project Name - MovieScope
 
+### Readme on its way!
+
+<!--
 <ol>
     <li> 
         <h3> Split video into frames </h3><br>
@@ -10,5 +13,6 @@
     </li>
 
 </ol>
-
+-->
+<hr>
 
