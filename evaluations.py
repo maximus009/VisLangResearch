@@ -1,29 +1,25 @@
 ## write the evaluation functions
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
 import os
 import numpy as np
 import gc
 
-from optical.optical_models import spatio_temporal_model
-from optical.optical_utils import get_blocks
+## from optical.optical_models import spatio_temporal_model
 
-from text_summary.text_models import fastText_model
 
 base_path = os.getcwd()
 if not os.path.basename(base_path) == 'moviescope':
     base_path = os.path.join(base_path, '..')
 
 from utils import load_pkl
-from keras.models import load_model
 
-import keras.backend as K
 
 ## common variables
 num_classes = 13
 
 
 def find_precision_recall(yTrue, yPreds):
+    from sklearn.metrics import precision_recall_curve
+    from sklearn.metrics import average_precision_score
     precision = {}
     recall = {}
     avg_pr = {}
@@ -37,6 +33,7 @@ def find_precision_recall(yTrue, yPreds):
 
 def infer_fastVideo(_id, featureName='res', model=None):
 
+    from keras.models import load_model
     featuresPath = os.path.join(base_path, 'data','frameFeatures','{}Features'.format(featureName))
     if type(_id) == list:
         _multiple = True
@@ -78,6 +75,9 @@ def infer_fastVideo(_id, featureName='res', model=None):
         return pred[0]
 
 def infer_flownet(_id, model=None):
+
+    from keras.models import load_model
+    from optical.optical_utils import get_blocks
     if type(_id) == list:
         _multiple = True
     else:
@@ -115,6 +115,10 @@ def infer_flownet(_id, model=None):
         return pred[0]
 
 def infer_fastText(_id, weightsPath=None):
+
+    from text_summary.text_models import fastText_model
+    import keras.backend as K
+    from keras.models import load_model
     if type(_id) == list:
         _multiple = True
     else:
