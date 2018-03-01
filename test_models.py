@@ -70,15 +70,15 @@ def late_fusion(load=True):
 
     if not load:
         input_layer = Input(shape=(13,2))
-        out = Dense(13, activation='softmax', use_bias=False)(input_layer)
+        out = Dense(13, activation='sigmoid', use_bias=False)(input_layer)
         out = Flatten()(Dense(1, activation='sigmoid', use_bias=False)(out))
         model = Model(inputs=input_layer, outputs=out)
         model.summary()
     else:
         model = load_model("model_vislang_late_2.h5")
 
-    model.compile(loss='binary_crossentropy', optimizer=SGD(lr=1e-3, decay=1e-2, nesterov=True, momentum=0.8))
-    model.fit(train_input, trainLabels[:train_limit], validation_data=(val_input, valLabels[:val_limit]), epochs=200)
+    model.compile(loss='binary_crossentropy', optimizer=SGD(lr=1e-2, decay=1e-4, nesterov=True, momentum=0.8))
+    model.fit(train_input, trainLabels[:train_limit], validation_data=(val_input, valLabels[:val_limit]), epochs=400)
     model.save('model_vislang_late_2.h5')
     model.save_weights('weights_vislang_late_2.h5')
 
@@ -98,12 +98,25 @@ def test_late_fusion():
 
 def modal_attention():
     from keras.models import load_model
+    import numpy as np
     model = load_model('model_vislang_late_2.h5')
     genre_layer = model.layers[1].get_weights()[0].T
+    genre_layer = np.abs(genre_layer)
     print genre_layer
+    print np.sum(np.exp(genre_layer), axis=1)
+    print np.exp(genre_layer)
+    print np.exp(genre_layer)/np.expand_dims(np.sum(np.exp(genre_layer), axis=1), -1)
+
+
     #for l in model.layers:
     #    print l.get_weights()
 
-late_fusion()
+#late_fusion(False)
 #print test_late_fusion()
-modal_attention()
+#modal_attention()
+def store_val_preds():
+    from utils import dump_pkl
+    preds, a = test_fastVideo_set(testIds, testLabels)
+    dump_pkl(preds, "predictions/video_test_preds.p")
+
+store_val_preds()
